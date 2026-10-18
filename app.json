@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "JobTracker",
+    "slug": "job-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#212529"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
