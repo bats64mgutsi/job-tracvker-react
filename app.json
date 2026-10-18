@@ -10,6 +10,21 @@
     },
     "web": {
       "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d1dbf0f0-4b09-45f8-9811-89788ae79003"
+      }
+    },
+    "owner": "lesedijonas12s-team",
+    "android": {
+      "package": "com.lesedijonas12steam.jobtracker"
+    },
+    "ios": {
+      "bundleIdentifier": "com.lesedijonas12steam.jobtracker",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     }
   }
 }
