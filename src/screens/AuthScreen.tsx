@@ -23,7 +23,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login', onNaviga
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,17 +30,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login', onNaviga
     setIsSignUp(!isSignUp);
     setErrorMessage('');
     setPassword('');
-    setConfirmPassword('');
   };
 
   const handleSubmit = async () => {
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !password || isSubmitting) return;
-
-    if (isSignUp && password !== confirmPassword) {
-      setErrorMessage('Passwords do not match.');
-      return;
-    }
 
     if (password.length < 6) {
       setErrorMessage('Password must be at least 6 characters.');
@@ -73,7 +66,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login', onNaviga
     }
   };
 
-  const isInvalid = !email.trim() || !password || (isSignUp && !confirmPassword);
+  const isInvalid = !email.trim() || !password;
 
   return (
     <KeyboardAvoidingView
@@ -124,22 +117,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login', onNaviga
               editable={!isSubmitting}
             />
           </View>
-
-          {isSignUp ? (
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Confirm Password</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Re-enter password"
-                placeholderTextColor="#6c757d"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                autoCapitalize="none"
-                editable={!isSubmitting}
-              />
-            </View>
-          ) : null}
 
           <TouchableOpacity
             style={[styles.btnPrimary, isInvalid || isSubmitting ? styles.btnDisabled : null]}
