@@ -1,9 +1,9 @@
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyBjNCQTcuoidICEQvZVupX4zzKQNxdeGOM",
-  authDomain: "job-tracking-app-4110f.firebaseapp.com",
-  projectId: "job-tracking-app-4110f",
-  storageBucket: "job-tracking-app-4110f.firebasestorage.app",
-  messagingSenderId: "825184122958",
-  appId: "1:825184122958:web:86943a69f04216ad6ceb1f"
+  apiKey: "AIzaSyA11Ddq2AxroINDBYQnteGwPZ4oL8w6SdE",
+  authDomain: "job-application-tracker-dcf0f.firebaseapp.com",
+  projectId: "job-application-tracker-dcf0f",
+  storageBucket: "job-application-tracker-dcf0f.firebasestorage.app",
+  messagingSenderId: "364470596338",
+  appId: "1:364470596338:web:06e7d2a5a77cb790e1d66b"
 };

@@ -35,10 +35,7 @@ export class JobService {
       jobDescription: job.jobDescription ?? '',
       generatedCv: job.generatedCv ?? '',
       generatedCoverLetter: job.generatedCoverLetter ?? '',
-      jobUpdates: job.jobUpdates.map((u) => ({
-        status: u.status,
-        updatedAt: u.updatedAt,
-      }))
+      status: job.status
     });
     return { ...job, id: docRef.id };
   }
@@ -54,30 +51,17 @@ export class JobService {
 
     const jobRef = doc(this.db, 'users', uid, 'jobs', jobId);
     await updateDoc(jobRef, {
-      jobUpdates: arrayUnion({ status: newStatus, updatedAt: new Date() })
+      status: { status: newStatus, updatedAt: new Date() }
     });
   }
 
   private toJob(id: string, data: DocumentData): Job {
-    const rawUpdates = data['jobUpdates'] ?? [];
-    const jobUpdates: JobUpdate[] = rawUpdates.map((u: any) => {
-      const rawDate = u.updatedAt ?? u.updateAt;
-      let date: Date;
-      if (rawDate instanceof Timestamp) {
-        date = rawDate.toDate();
-      } else if (rawDate instanceof Date) {
-        date = rawDate;
-      } else if (rawDate) {
-        date = new Date(rawDate);
-      } else {
-        date = new Date();
-      }
-
-      return {
-        status: u.status as JobStatus,
-        updatedAt: date,
-      };
-    });
+    const rawstatus = data['status'] ?? {};
+    const status = {
+        status: rawstatus.status as JobStatus,
+        updatedAt: rawstatus.updatedAt instanceof Timestamp
+          ? rawstatus.updatedAt.toDate() : new Date(rawstatus.updatedAt)
+    }
 
     return {
       id,
@@ -86,7 +70,7 @@ export class JobService {
       jobDescription: data['jobDescription'] ?? '',
       generatedCv: data['generatedCv'],
       generatedCoverLetter: data['generatedCoverLetter'],
-      jobUpdates
+      status
     };
   }
 }
