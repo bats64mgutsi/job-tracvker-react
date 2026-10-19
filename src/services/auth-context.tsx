@@ -5,54 +5,42 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  UserCredential
 } from 'firebase/auth';
 import { firebaseAuth } from '../firebase';
 
-export interface AuthContextType {
+interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  signIn: (email: string, pass: string) => Promise<UserCredential>;
-  signUp: (email: string, pass: string) => Promise<UserCredential>;
-  logOut: () => Promise<void>;
-  /** Alias for backward compatibility */
+  signIn: (email: string, pass: string) => Promise<any>;
+  signUp: (email: string, pass: string) => Promise<any>;
   logout: () => Promise<void>;
+  logOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  currentUser: null,
-  loading: true,
-  signIn: async () => ({} as UserCredential),
-  signUp: async () => ({} as UserCredential),
-  logOut: async () => {},
-  logout: async () => {},
-});
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+    return onAuthStateChanged(firebaseAuth, (user) => {
       setCurrentUser(user);
       setLoading(false);
     });
-    return unsubscribe;
   }, []);
 
-  const signIn = (email: string, pass: string) => signInWithEmailAndPassword(firebaseAuth, email, pass);
-  const signUp = (email: string, pass: string) => createUserWithEmailAndPassword(firebaseAuth, email, pass);
-  const logOut = () => signOut(firebaseAuth);
+  const logout = () => signOut(firebaseAuth);
 
   return (
     <AuthContext.Provider
       value={{
         currentUser,
         loading,
-        signIn,
-        signUp,
-        logOut,
-        logout: logOut,
+        signIn: (email, pass) => signInWithEmailAndPassword(firebaseAuth, email, pass),
+        signUp: (email, pass) => createUserWithEmailAndPassword(firebaseAuth, email, pass),
+        logout,
+        logOut: logout,
       }}
     >
       {children}
@@ -60,6 +48,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);
