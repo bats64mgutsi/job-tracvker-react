@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => 
   return (
     <View style={styles.headerContainer}>
       <View style={styles.brandRow}>
-        <TouchableOpacity onPress={() => onNavigate('home')} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => onNavigate('home')}>
           <Text style={styles.brandText}>Job Tracker</Text>
         </TouchableOpacity>
         {currentUser?.email ? (

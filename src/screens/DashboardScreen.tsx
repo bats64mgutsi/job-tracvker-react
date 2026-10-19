@@ -37,17 +37,6 @@ function formatMedium(date: Date | any): string {
   });
 }
 
-function getLatestJobUpdate(job: Job): JobUpdate {
-  if (!job.jobUpdates || job.jobUpdates.length === 0) {
-    return { status: JobStatus.NEW, updatedAt: new Date() };
-  }
-  return job.jobUpdates.reduce((latest, current) => {
-    const currentDate = current.updatedAt instanceof Date ? current.updatedAt : new Date(current.updatedAt);
-    const latestDate = latest.updatedAt instanceof Date ? latest.updatedAt : new Date(latest.updatedAt);
-    return currentDate > latestDate ? current : latest;
-  });
-}
-
 const ALL_STATUSES: JobStatus[] = [
   JobStatus.NEW,
   JobStatus.APPLIED,
@@ -171,7 +160,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
         company: newCompany.trim() || 'Untitled Company',
         role: newRole.trim() || 'Untitled Role',
         jobDescription: newJobDescription.trim(),
-        jobUpdates: [{ status: JobStatus.NEW, updatedAt: new Date() }],
+        status: { status: JobStatus.NEW, updatedAt: new Date() },
       };
 
       await jobService.addJob(newJob);
@@ -230,7 +219,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
   const handleUpdateJobStatus = async (job: Job, newStatus: JobStatus) => {
     try {
       await jobService.updateJobStatus(job.id!, newStatus);
-      job.jobUpdates.push({ status: newStatus, updatedAt: new Date() });
+      job.status = { status: newStatus, updatedAt: new Date() };
       forceUpdate((n) => n + 1);
     } catch (err) {
       console.error('Failed to update job status:', err);
@@ -242,7 +231,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
     if (selectedFilter === 'ALL') return jobs;
-    return jobs.filter((j) => getLatestJobUpdate(j).status === selectedFilter);
+    return jobs.filter((j) => j.status.status === selectedFilter);
   }, [jobs, selectedFilter]);
 
   return (
@@ -463,7 +452,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
                   <Text style={styles.detailCompany}>{viewedJob.company || 'Untitled Company'}</Text>
                   <Text style={styles.detailRole}>{viewedJob.role || 'Untitled Role'}</Text>
                   <Text style={styles.detailTimestamp}>
-                    Updated: {formatMedium(getLatestJobUpdate(viewedJob).updatedAt)}
+                    Updated: {formatMedium(viewedJob.status.updatedAt)}
                   </Text>
                 </View>
 
@@ -482,7 +471,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
 
               <View style={styles.statusButtonsWrap}>
                 {ALL_STATUSES.map((status) => {
-                  const isCurrent = getLatestJobUpdate(viewedJob).status === status;
+                  const isCurrent = viewedJob.status.status === status;
                   const badgeStyle = getStatusBadgeStyle(status);
 
                   return (
@@ -600,7 +589,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
               ) : (
                 <View style={styles.cardsGrid}>
                   {filteredJobs.map((job) => {
-                    const latest = getLatestJobUpdate(job);
+                    const latest = job.status;
                     const badge = getStatusBadgeStyle(latest.status);
                     const isSelected = viewedJob?.id === job.id;
 

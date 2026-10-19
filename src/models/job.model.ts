@@ -17,7 +17,7 @@ export interface Job {
   company?: string;
   role?: string;
 
-  jobUpdates: JobUpdate[];
+  status: JobUpdate;
   jobDescription: string;
 
   generatedCoverLetter?: string;

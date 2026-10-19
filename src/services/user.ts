@@ -5,12 +5,6 @@ import { User } from '../models/user.model';
 export class UserService {
   private db = firestore;
 
-  private userDoc(uid?: string) {
-    const targetUid = uid || firebaseAuth.currentUser?.uid;
-    if (!targetUid) throw new Error('Cannot access user: No user is signed in.');
-    return doc(this.db, 'users', targetUid);
-  }
-
   async updateUser(userOrUid: User | string, maybeUser?: Partial<User>): Promise<void> {
     let targetUid: string;
     let cvValue: string | undefined;
