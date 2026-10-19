@@ -20,12 +20,11 @@ export class JobService {
     if (!uid) {
       throw new Error('Cannot access jobs: No user is signed in.');
     }
-    return collection(this.db, 'users', uid, 'jobs'); //   user/{uid}/jobs
+    return collection(this.db, 'users', uid, 'jobs');
   }
 
   async getJobs(): Promise<Job[]> {
     const snapshot = await getDocs(this.jobsCollection());
-
     return snapshot.docs.map((d) => this.toJob(d.id, d.data()));
   }
 
@@ -34,6 +33,8 @@ export class JobService {
       company: job.company ?? '',
       role: job.role ?? '',
       jobDescription: job.jobDescription ?? '',
+      generatedCv: job.generatedCv ?? '',
+      generatedCoverLetter: job.generatedCoverLetter ?? '',
       jobUpdates: job.jobUpdates.map((u) => ({
         status: u.status,
         updatedAt: u.updatedAt,
@@ -42,27 +43,46 @@ export class JobService {
     return { ...job, id: docRef.id };
   }
 
-  async updateJobStatus(jobId: string, newStatus: JobStatus): Promise<Job | undefined> {
+  async saveJob(job: Job): Promise<string> {
+    const created = await this.addJob(job);
+    return created.id ?? '';
+  }
+
+  async updateJobStatus(jobId: string, newStatus: JobStatus): Promise<void> {
     const uid = firebaseAuth.currentUser?.uid;
-    if (!uid) return undefined;
+    if (!uid) return;
 
     const jobRef = doc(this.db, 'users', uid, 'jobs', jobId);
     await updateDoc(jobRef, {
-      jobUpdates: arrayUnion({ status: newStatus, updateAt: new Date() })
+      jobUpdates: arrayUnion({ status: newStatus, updatedAt: new Date() })
     });
-    return undefined;
   }
 
   private toJob(id: string, data: DocumentData): Job {
-    const jobUpdates: JobUpdate[] = (data['jobUpdates'] ?? []).map((u: any) => ({
-      status: u.status,
-      updatedAt: u.updatedAt instanceof Timestamp ? u.updatedAt.toDate() : u.updatedAt,
-    }));
+    const rawUpdates = data['jobUpdates'] ?? [];
+    const jobUpdates: JobUpdate[] = rawUpdates.map((u: any) => {
+      const rawDate = u.updatedAt ?? u.updateAt;
+      let date: Date;
+      if (rawDate instanceof Timestamp) {
+        date = rawDate.toDate();
+      } else if (rawDate instanceof Date) {
+        date = rawDate;
+      } else if (rawDate) {
+        date = new Date(rawDate);
+      } else {
+        date = new Date();
+      }
+
+      return {
+        status: u.status as JobStatus,
+        updatedAt: date,
+      };
+    });
 
     return {
       id,
-      company: data['company'],
-      role: data['role'],
+      company: data['company'] ?? '',
+      role: data['role'] ?? '',
       jobDescription: data['jobDescription'] ?? '',
       generatedCv: data['generatedCv'],
       generatedCoverLetter: data['generatedCoverLetter'],
