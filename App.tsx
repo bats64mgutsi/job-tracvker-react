@@ -4,8 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from './src/services/auth-context';
 import { Header } from './src/components/Header';
 import { HomeScreen } from './src/screens/HomeScreen';
-import { LoginScreen } from './src/screens/LoginScreen';
-import { SignUpScreen } from './src/screens/SignUpScreen';
+import { AuthScreen } from './src/screens/AuthScreen';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 
 export type ScreenName = 'home' | 'login' | 'signup' | 'dashboard';
@@ -52,8 +51,8 @@ function MainNavigator() {
       <Header currentScreen={currentScreen} onNavigate={navigateTo} />
       <View style={styles.screenWrapper}>
         {currentScreen === 'home' && <HomeScreen onNavigate={navigateTo} />}
-        {currentScreen === 'login' && <LoginScreen onNavigate={navigateTo} />}
-        {currentScreen === 'signup' && <SignUpScreen onNavigate={navigateTo} />}
+        {currentScreen === 'login' && <AuthScreen mode="login" onNavigate={navigateTo} />}
+        {currentScreen === 'signup' && <AuthScreen mode="signup" onNavigate={navigateTo} />}
         {currentScreen === 'dashboard' && <DashboardScreen onNavigate={navigateTo} />}
       </View>
     </SafeAreaView>
