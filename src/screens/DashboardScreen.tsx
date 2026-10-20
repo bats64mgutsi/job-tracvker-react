@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Platform,
-  Alert,
-} from 'react-native';
+import { View, ScrollView, Platform, Alert } from 'react-native';
 import { jobService } from '../services/job';
 import { userService } from '../services/user';
 import { useAuth } from '../services/auth-context';
 import { Job, JobStatus } from '../models/job.model';
 import { NativeMarkdown } from '../components/NativeMarkdown';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
 
 export interface DashboardScreenProps {
   onNavigate?: (screen: 'home' | 'login' | 'signup' | 'dashboard') => void;
@@ -111,202 +107,125 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <Text style={styles.pageTitle}>Dashboard</Text>
-      <Text style={styles.subtitle}>Signed in as {currentUser?.email || 'User'}</Text>
+    <ScrollView contentContainerClassName="p-4 max-w-2xl w-full self-center bg-background">
+      <Text className="text-2xl font-bold text-foreground">Dashboard</Text>
+      <Text className="text-sm text-muted-foreground mb-4">
+        Signed in as {currentUser?.email || 'User'}
+      </Text>
 
       {/* Feature 1: Edit CV */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Your CV</Text>
-        <TextInput
-          style={[styles.input, styles.multiline]}
-          value={cvText}
-          onChangeText={setCvText}
-          placeholder="Write your CV here..."
-          multiline
-          textAlignVertical="top"
-        />
-        <TouchableOpacity style={styles.button} onPress={handleSaveCv}>
-          <Text style={styles.buttonText}>Save CV</Text>
-        </TouchableOpacity>
-      </View>
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle className="text-lg">Your CV</CardTitle>
+        </CardHeader>
+        <CardContent className="gap-3">
+          <Input
+            className="min-h-[120px] py-2 text-start"
+            value={cvText}
+            onChangeText={setCvText}
+            placeholder="Write your CV here..."
+            multiline
+            textAlignVertical="top"
+          />
+          <Button onPress={handleSaveCv}>
+            <Text>Save CV</Text>
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Feature 2: Load a job */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Add a Job</Text>
-        <TextInput
-          style={styles.input}
-          value={newCompany}
-          onChangeText={setNewCompany}
-          placeholder="Company"
-        />
-        <TextInput
-          style={styles.input}
-          value={newRole}
-          onChangeText={setNewRole}
-          placeholder="Role"
-        />
-        <TextInput
-          style={[styles.input, styles.multiline]}
-          value={newJobDescription}
-          onChangeText={setNewJobDescription}
-          placeholder="Job description"
-          multiline
-          textAlignVertical="top"
-        />
-        <TouchableOpacity style={styles.button} onPress={handleAddJob}>
-          <Text style={styles.buttonText}>Add Job</Text>
-        </TouchableOpacity>
-      </View>
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle className="text-lg">Add a Job</CardTitle>
+        </CardHeader>
+        <CardContent className="gap-3">
+          <Input
+            value={newCompany}
+            onChangeText={setNewCompany}
+            placeholder="Company"
+          />
+          <Input
+            value={newRole}
+            onChangeText={setNewRole}
+            placeholder="Role"
+          />
+          <Input
+            className="min-h-[100px] py-2 text-start"
+            value={newJobDescription}
+            onChangeText={setNewJobDescription}
+            placeholder="Job description"
+            multiline
+            textAlignVertical="top"
+          />
+          <Button onPress={handleAddJob}>
+            <Text>Add Job</Text>
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Feature 3 & 4: Jobs list with status update + tap to view details */}
-      <Text style={styles.cardTitle}>Jobs ({jobs.length})</Text>
+      <Text className="text-lg font-bold text-foreground mb-3">Jobs ({jobs.length})</Text>
       {jobs.map((job) => (
-        <View key={job.id} style={styles.card}>
-          <TouchableOpacity onPress={() => handleToggleDetails(job)}>
-            <Text style={styles.jobCompany}>{job.company}</Text>
-            <Text style={styles.jobRole}>{job.role}</Text>
-            <Text style={styles.jobStatus}>Status: {job.status.status}</Text>
-            <Text style={styles.tapHint}>
-              {expandedJobId === job.id ? 'Tap to hide details' : 'Tap to view generated CV & cover letter'}
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.statusRow}>
-            {ALL_STATUSES.map((status) => (
-              <TouchableOpacity
-                key={status}
-                style={styles.statusButton}
-                onPress={() => handleUpdateJobStatus(job, status)}
-              >
-                <Text style={styles.statusButtonText}>{status}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {expandedJobId === job.id && (
-            <View style={styles.detailSection}>
-              <Text style={styles.detailLabel}>Generated CV</Text>
-              <NativeMarkdown content={job.generatedCv} fallbackText='No Cv generated yet' />
-
-              <Text style={styles.detailLabel}>Cover Letter</Text>
-              <NativeMarkdown content={job.generatedCoverLetter} fallbackText='No cover letter generated yet' />
+        <Card key={job.id} className="mb-3">
+          <CardHeader>
+            <View className="flex-row items-start justify-between">
+              <View className="flex-1 mr-2">
+                <CardTitle className="text-base font-bold">{job.company}</CardTitle>
+                <CardDescription className="text-sm">{job.role}</CardDescription>
+              </View>
+              <Badge variant="outline">
+                <Text>{job.status.status}</Text>
+              </Badge>
             </View>
-          )}
-        </View>
+            <Button
+              variant="ghost"
+              size="sm"
+              onPress={() => handleToggleDetails(job)}
+              className="self-start px-0 h-auto mt-2"
+            >
+              <Text className="text-xs text-primary font-medium">
+                {expandedJobId === job.id
+                  ? 'Hide details'
+                  : 'View generated CV & cover letter'}
+              </Text>
+            </Button>
+          </CardHeader>
+
+          <CardContent className="gap-3 pt-0">
+            <View className="flex-row flex-wrap gap-2">
+              {ALL_STATUSES.map((status) => (
+                <Button
+                  key={status}
+                  size="sm"
+                  variant={job.status.status === status ? 'default' : 'secondary'}
+                  onPress={() => handleUpdateJobStatus(job, status)}
+                  className="h-8 px-2.5"
+                >
+                  <Text className="text-xs">{status}</Text>
+                </Button>
+              ))}
+            </View>
+
+            {expandedJobId === job.id && (
+              <View className="mt-3 pt-3 border-t border-border gap-2">
+                <Text className="text-sm font-semibold text-foreground">Generated CV</Text>
+                <NativeMarkdown
+                  content={job.generatedCv}
+                  fallbackText="No CV generated yet"
+                />
+
+                <Text className="text-sm font-semibold text-foreground mt-2">Cover Letter</Text>
+                <NativeMarkdown
+                  content={job.generatedCoverLetter}
+                  fallbackText="No cover letter generated yet"
+                />
+              </View>
+            )}
+          </CardContent>
+        </Card>
       ))}
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  content: {
-    padding: 16,
-    maxWidth: 700,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  pageTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#212529',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginBottom: 20,
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#212529',
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 15,
-    marginBottom: 10,
-  },
-  multiline: {
-    minHeight: 120,
-  },
-  button: {
-    backgroundColor: '#0d6efd',
-    paddingVertical: 10,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  jobCompany: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#212529',
-  },
-  jobRole: {
-    fontSize: 14,
-    color: '#495057',
-  },
-  jobStatus: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginTop: 4,
-    marginBottom: 10,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  statusButton: {
-    backgroundColor: '#e9ecef',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  statusButtonText: {
-    fontSize: 13,
-    color: '#495057',
-    fontWeight: '600',
-  },
-  tapHint: {
-    fontSize: 12,
-    color: '#0d6efd',
-    marginBottom: 10,
-  },
-  detailSection: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
-  },
-  detailLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#212529',
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  detailText: {
-    fontSize: 14,
-    color: '#495057',
-    lineHeight: 20,
-  },
-});
 
 export default DashboardScreen;

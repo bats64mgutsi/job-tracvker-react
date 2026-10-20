@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
-  ActivityIndicator,
-} from 'react-native';
+import { KeyboardAvoidingView, ScrollView, Platform, View, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../services/auth-context';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 export interface AuthScreenProps {
   mode?: 'login' | 'signup';
@@ -79,183 +73,82 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login' }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardContainer}
+      className="flex-1"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerClassName="flex-grow justify-center items-center p-6 bg-background"
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.card}>
-          <Text style={styles.title}>{isSignUp ? 'Create Account' : 'Sign In'}</Text>
-          <Text style={styles.subtitle}>
-            {isSignUp ? 'Start tracking your job applications' : 'Welcome back to Job Tracker'}
-          </Text>
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center items-center">
+            <CardTitle className="text-2xl font-bold">
+              {isSignUp ? 'Create Account' : 'Sign In'}
+            </CardTitle>
+            <CardDescription className="text-center text-sm">
+              {isSignUp ? 'Start tracking your job applications' : 'Welcome back to Job Tracker'}
+            </CardDescription>
+          </CardHeader>
 
-          {errorMessage ? (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>{errorMessage}</Text>
+          <CardContent className="gap-4">
+            {errorMessage ? (
+              <View className="bg-destructive/15 border border-destructive/30 rounded-md p-3">
+                <Text className="text-destructive text-sm font-medium">{errorMessage}</Text>
+              </View>
+            ) : null}
+
+            <View className="gap-1.5">
+              <Text className="text-sm font-medium text-foreground">Email Address</Text>
+              <Input
+                placeholder="name@example.com"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                autoComplete="email"
+                editable={!isSubmitting}
+              />
             </View>
-          ) : null}
 
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="name@example.com"
-              placeholderTextColor="#6c757d"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-              editable={!isSubmitting}
-            />
-          </View>
+            <View className="gap-1.5">
+              <Text className="text-sm font-medium text-foreground">Password</Text>
+              <Input
+                placeholder={isSignUp ? 'At least 6 characters' : 'Enter password'}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                editable={!isSubmitting}
+              />
+            </View>
 
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={isSignUp ? 'At least 6 characters' : 'Enter password'}
-              placeholderTextColor="#6c757d"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              editable={!isSubmitting}
-            />
-          </View>
+            <Button
+              onPress={handleSubmit}
+              disabled={isInvalid || isSubmitting}
+              className="w-full mt-2"
+            >
+              {isSubmitting ? (
+                <ActivityIndicator color="#ffffff" size="small" />
+              ) : (
+                <Text>{isSignUp ? 'Sign Up' : 'Sign In'}</Text>
+              )}
+            </Button>
+          </CardContent>
 
-          <TouchableOpacity
-            style={[styles.btnPrimary, isInvalid || isSubmitting ? styles.btnDisabled : null]}
-            onPress={handleSubmit}
-            disabled={isInvalid || isSubmitting}
-            activeOpacity={0.8}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color="#ffffff" size="small" />
-            ) : (
-              <Text style={styles.btnPrimaryText}>
-                {isSignUp ? 'Sign Up' : 'Sign In'}
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.footerLinkRow}>
-            <Text style={styles.footerText}>
+          <CardFooter className="justify-center">
+            <Text className="text-sm text-muted-foreground">
               {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
             </Text>
-            <TouchableOpacity onPress={switchMode} disabled={isSubmitting}>
-              <Text style={styles.linkText}>
+            <Button variant="link" onPress={switchMode} disabled={isSubmitting} className="h-auto p-0">
+              <Text className="text-sm font-bold text-primary">
                 {isSignUp ? 'Sign In' : 'Sign Up'}
               </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            </Button>
+          </CardFooter>
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  keyboardContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f8f9fa',
-  },
-  card: {
-    width: '100%',
-    maxWidth: 440,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: '#dee2e6',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#212529',
-    textAlign: 'center',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#6c757d',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  errorBox: {
-    backgroundColor: '#f8d7da',
-    borderColor: '#f5c2c7',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-  },
-  errorText: {
-    color: '#842029',
-    fontSize: 14,
-  },
-  formGroup: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#495057',
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 15,
-    color: '#212529',
-    backgroundColor: '#ffffff',
-  },
-  btnPrimary: {
-    backgroundColor: '#0d6efd',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  btnDisabled: {
-    backgroundColor: '#6ea8fe',
-  },
-  btnPrimaryText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  footerLinkRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  footerText: {
-    fontSize: 14,
-    color: '#6c757d',
-  },
-  linkText: {
-    fontSize: 14,
-    color: '#0d6efd',
-    fontWeight: 'bold',
-  },
-});
 
 export default AuthScreen;
