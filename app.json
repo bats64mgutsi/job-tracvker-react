@@ -2,6 +2,7 @@
   "expo": {
     "name": "JobTracker",
     "slug": "job-tracker",
+    "scheme": "jobtracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -25,6 +26,9 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

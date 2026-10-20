@@ -1,28 +1,31 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { useRouter, usePathname } from 'expo-router';
 import { useAuth } from '../services/auth-context';
 
-export interface HeaderProps {
-  currentScreen: string;
-  onNavigate: (screen: 'home' | 'login' | 'signup' | 'dashboard') => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => {
+export const Header: React.FC = () => {
+  const router = useRouter();
+  const pathname = usePathname();
   const { currentUser, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
       await logout();
-      onNavigate('login');
+      router.replace('/login');
     } catch (e) {
       console.error('Logout error:', e);
     }
   };
 
+  const isHome = pathname === '/' || pathname === '';
+  const isDashboard = pathname.startsWith('/dashboard');
+  const isLogin = pathname.startsWith('/login');
+  const isSignUp = pathname.startsWith('/signup');
+
   return (
     <View style={styles.headerContainer}>
       <View style={styles.brandRow}>
-        <TouchableOpacity onPress={() => onNavigate('home')}>
+        <TouchableOpacity onPress={() => router.push('/')} activeOpacity={0.7}>
           <Text style={styles.brandText}>Job Tracker</Text>
         </TouchableOpacity>
         {currentUser?.email ? (
@@ -34,10 +37,10 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => 
 
       <View style={styles.navLinksRow}>
         <TouchableOpacity
-          style={[styles.navBtn, currentScreen === 'home' && styles.navBtnActive]}
-          onPress={() => onNavigate('home')}
+          style={[styles.navBtn, isHome && styles.navBtnActive]}
+          onPress={() => router.push('/')}
         >
-          <Text style={[styles.navBtnText, currentScreen === 'home' && styles.navBtnTextActive]}>
+          <Text style={[styles.navBtnText, isHome && styles.navBtnTextActive]}>
             Home
           </Text>
         </TouchableOpacity>
@@ -45,10 +48,10 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => 
         {currentUser ? (
           <>
             <TouchableOpacity
-              style={[styles.navBtn, currentScreen === 'dashboard' && styles.navBtnActive]}
-              onPress={() => onNavigate('dashboard')}
+              style={[styles.navBtn, isDashboard && styles.navBtnActive]}
+              onPress={() => router.push('/dashboard')}
             >
-              <Text style={[styles.navBtnText, currentScreen === 'dashboard' && styles.navBtnTextActive]}>
+              <Text style={[styles.navBtnText, isDashboard && styles.navBtnTextActive]}>
                 Dashboard
               </Text>
             </TouchableOpacity>
@@ -60,19 +63,19 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => 
         ) : (
           <>
             <TouchableOpacity
-              style={[styles.navBtn, currentScreen === 'login' && styles.navBtnActive]}
-              onPress={() => onNavigate('login')}
+              style={[styles.navBtn, isLogin && styles.navBtnActive]}
+              onPress={() => router.push('/login')}
             >
-              <Text style={[styles.navBtnText, currentScreen === 'login' && styles.navBtnTextActive]}>
+              <Text style={[styles.navBtnText, isLogin && styles.navBtnTextActive]}>
                 Sign In
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.navBtn, currentScreen === 'signup' && styles.navBtnActive]}
-              onPress={() => onNavigate('signup')}
+              style={[styles.navBtn, isSignUp && styles.navBtnActive]}
+              onPress={() => router.push('/signup')}
             >
-              <Text style={[styles.navBtnText, currentScreen === 'signup' && styles.navBtnTextActive]}>
+              <Text style={[styles.navBtnText, isSignUp && styles.navBtnTextActive]}>
                 Sign Up
               </Text>
             </TouchableOpacity>

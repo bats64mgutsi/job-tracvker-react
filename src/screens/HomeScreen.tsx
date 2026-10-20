@@ -1,19 +1,17 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../services/auth-context';
 
-export interface HomeScreenProps {
-  onNavigate: (screen: 'home' | 'login' | 'signup' | 'dashboard') => void;
-}
-
-export const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
+export const HomeScreen: React.FC = () => {
+  const router = useRouter();
   const { currentUser } = useAuth();
 
   const handleDashboardPress = () => {
     if (currentUser) {
-      onNavigate('dashboard');
+      router.push('/dashboard');
     } else {
-      onNavigate('login');
+      router.push('/login');
     }
   };
 
@@ -38,7 +36,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           {!currentUser ? (
             <TouchableOpacity
               style={styles.secondaryButton}
-              onPress={() => onNavigate('signup')}
+              onPress={() => router.push('/signup')}
               activeOpacity={0.8}
             >
               <Text style={styles.secondaryButtonText}>Create New Account</Text>

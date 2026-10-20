@@ -20,9 +20,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
-    "App.tsx",
-    "index.js"
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",

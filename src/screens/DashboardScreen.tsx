@@ -19,7 +19,7 @@ import { User } from '../models/user.model';
 import { NativeMarkdown } from '../components/NativeMarkdown';
 
 export interface DashboardScreenProps {
-  onNavigate: (screen: 'home' | 'login' | 'signup' | 'dashboard') => void;
+  onNavigate?: (screen: 'home' | 'login' | 'signup' | 'dashboard') => void;
 }
 
 function formatMedium(date: Date | any): string {

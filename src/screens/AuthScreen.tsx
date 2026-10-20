@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,16 +10,21 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../services/auth-context';
 
 export interface AuthScreenProps {
   mode?: 'login' | 'signup';
-  onNavigate: (screen: 'home' | 'login' | 'signup' | 'dashboard') => void;
 }
 
-export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login', onNavigate }) => {
+export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login' }) => {
+  const router = useRouter();
   const { signIn, signUp } = useAuth();
   const [isSignUp, setIsSignUp] = useState(mode === 'signup');
+
+  useEffect(() => {
+    setIsSignUp(mode === 'signup');
+  }, [mode]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,9 +32,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login', onNaviga
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const switchMode = () => {
-    setIsSignUp(!isSignUp);
     setErrorMessage('');
     setPassword('');
+    if (isSignUp) {
+      router.push('/login');
+    } else {
+      router.push('/signup');
+    }
   };
 
   const handleSubmit = async () => {
@@ -50,7 +59,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ mode = 'login', onNaviga
       } else {
         await signIn(trimmedEmail, password);
       }
-      onNavigate('dashboard');
+      router.replace('/dashboard');
     } catch (err: any) {
       console.warn('Auth Error:', err);
       const msg = err?.message || '';
