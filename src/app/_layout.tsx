@@ -4,6 +4,8 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../services/auth-context';
 import { Header } from '../components/Header';
+import { PortalHost } from '@rn-primitives/portal';
+import '../../global.css';
 
 function RootLayoutNav() {
   const { currentUser, loading } = useAuth();
@@ -48,6 +50,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AuthProvider>
         <RootLayoutNav />
+        <PortalHost />
       </AuthProvider>
     </SafeAreaProvider>
   );

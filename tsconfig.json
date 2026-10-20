@@ -16,11 +16,18 @@
     "noEmit": true,
     "esModuleInterop": true,
     "allowJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    // "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "nativewind-env.d.ts"
   ],
   "exclude": [
     "node_modules",
