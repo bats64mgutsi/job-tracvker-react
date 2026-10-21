@@ -1,41 +1,36 @@
 import React from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { View, type ViewStyle } from 'react-native';
 import Markdown from 'react-native-markdown-display';
+import { Text } from '@/components/ui/text';
 
 export interface NativeMarkdownProps {
   content?: string | null;
   fallbackText?: string;
   style?: ViewStyle;
+  className?: string;
 }
 
 export const NativeMarkdown: React.FC<NativeMarkdownProps> = ({
   content,
   fallbackText = 'No content available',
   style,
+  className,
 }) => {
-  if (!content || !content.trim()) {
+  if (!content?.trim()) {
     return (
-      <View style={[styles.container, style]}>
-        <Text style={styles.fallback}>{fallbackText}</Text>
+      <View className={className} style={style}>
+        <Text variant="muted" className="italic">
+          {fallbackText}
+        </Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, style]}>
+    <View className={className} style={style}>
       <Markdown>{content}</Markdown>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 4,
-  },
-  fallback: {
-    fontStyle: 'italic',
-    color: '#6c757d',
-    fontSize: 14,
-    marginVertical: 4,
-  },
-});
+export default NativeMarkdown;

@@ -1,11 +1,21 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { useRouter, usePathname } from 'expo-router';
+import { View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../services/auth-context';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+import {
+  Menubar,
+  MenubarMenu,
+  MenubarTrigger,
+  MenubarContent,
+  MenubarItem,
+  MenubarSeparator,
+  MenubarLabel,
+} from '@/components/ui/menubar';
 
 export const Header: React.FC = () => {
   const router = useRouter();
-  const pathname = usePathname();
   const { currentUser, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -17,142 +27,59 @@ export const Header: React.FC = () => {
     }
   };
 
-  const isHome = pathname === '/' || pathname === '';
-  const isDashboard = pathname.startsWith('/dashboard');
-  const isLogin = pathname.startsWith('/login');
-  const isSignUp = pathname.startsWith('/signup');
-
   return (
-    <View style={styles.headerContainer}>
-      <View style={styles.brandRow}>
-        <TouchableOpacity onPress={() => router.push('/')} activeOpacity={0.7}>
-          <Text style={styles.brandText}>Job Tracker</Text>
-        </TouchableOpacity>
-        {currentUser?.email ? (
-          <Text style={styles.userEmailText} numberOfLines={1}>
-            {currentUser.email}
-          </Text>
-        ) : null}
-      </View>
+    <View className="bg-card border-b border-border px-4 py-2.5 flex-row items-center justify-between">
+      <Button variant="ghost" size="sm" onPress={() => router.push('/')}>
+        <Text className="text-lg font-bold text-primary">Job Tracker</Text>
+      </Button>
 
-      <View style={styles.navLinksRow}>
-        <TouchableOpacity
-          style={[styles.navBtn, isHome && styles.navBtnActive]}
-          onPress={() => router.push('/')}
-        >
-          <Text style={[styles.navBtnText, isHome && styles.navBtnTextActive]}>
-            Home
-          </Text>
-        </TouchableOpacity>
+      <Menubar className="bg-primary/10 border border-primary/20 rounded-lg p-1 h-auto gap-1">
+        <MenubarMenu value="nav">
+          <MenubarTrigger className="rounded-md px-3 py-1.5 active:bg-primary/20">
+            <Text className="text-primary font-semibold">Navigation</Text>
+          </MenubarTrigger>
+          <MenubarContent align="end">
+            <MenubarItem onPress={() => router.push('/')}>
+              <Text>Home</Text>
+            </MenubarItem>
+            {currentUser ? (
+              <MenubarItem onPress={() => router.push('/dashboard')}>
+                <Text>Dashboard</Text>
+              </MenubarItem>
+            ) : null}
+          </MenubarContent>
+        </MenubarMenu>
 
-        {currentUser ? (
-          <>
-            <TouchableOpacity
-              style={[styles.navBtn, isDashboard && styles.navBtnActive]}
-              onPress={() => router.push('/dashboard')}
-            >
-              <Text style={[styles.navBtnText, isDashboard && styles.navBtnTextActive]}>
-                Dashboard
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-              <Text style={styles.logoutBtnText}>Log Out</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity
-              style={[styles.navBtn, isLogin && styles.navBtnActive]}
-              onPress={() => router.push('/login')}
-            >
-              <Text style={[styles.navBtnText, isLogin && styles.navBtnTextActive]}>
-                Sign In
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.navBtn, isSignUp && styles.navBtnActive]}
-              onPress={() => router.push('/signup')}
-            >
-              <Text style={[styles.navBtnText, isSignUp && styles.navBtnTextActive]}>
-                Sign Up
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+        <MenubarMenu value="account">
+          <MenubarTrigger className="bg-primary rounded-md px-3 py-1.5 active:bg-primary/90">
+            <Text className="text-primary-foreground font-semibold">Account</Text>
+          </MenubarTrigger>
+          <MenubarContent align="end">
+            {currentUser ? (
+              <>
+                {currentUser.email ? (
+                  <MenubarLabel numberOfLines={1}>{currentUser.email}</MenubarLabel>
+                ) : null}
+                <MenubarSeparator />
+                <MenubarItem variant="destructive" onPress={handleLogout}>
+                  <Text>Log Out</Text>
+                </MenubarItem>
+              </>
+            ) : (
+              <>
+                <MenubarItem onPress={() => router.push('/login')}>
+                  <Text>Sign In</Text>
+                </MenubarItem>
+                <MenubarItem onPress={() => router.push('/signup')}>
+                  <Text>Sign Up</Text>
+                </MenubarItem>
+              </>
+            )}
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: '#212529',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#343a40',
-    ...(Platform.OS === 'web'
-      ? {
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }
-      : {}),
-  },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: Platform.OS === 'web' ? 0 : 8,
-  },
-  brandText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
-  userEmailText: {
-    color: '#adb5bd',
-    fontSize: 13,
-    marginLeft: 12,
-    maxWidth: 180,
-  },
-  navLinksRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  navBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  navBtnActive: {
-    backgroundColor: '#343a40',
-  },
-  navBtnText: {
-    color: '#ced4da',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  navBtnTextActive: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-  logoutBtn: {
-    backgroundColor: '#dc3545',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  logoutBtnText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-});
 
 export default Header;

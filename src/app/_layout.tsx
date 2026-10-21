@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, StatusBar, ActivityIndicator } from 'react-native';
+import { View, StatusBar, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../services/auth-context';
@@ -28,17 +28,17 @@ function RootLayoutNav() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0d6efd" />
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#f59e0b" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView className="flex-1 bg-background">
+      <StatusBar barStyle="default" />
       <Header />
-      <View style={styles.content}>
+      <View className="flex-1">
         <Slot />
       </View>
     </SafeAreaView>
@@ -55,9 +55,3 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#212529' },
-  content: { flex: 1, backgroundColor: '#f8f9fa' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f9fa' },
-});
